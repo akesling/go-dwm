@@ -8,6 +8,10 @@ package main
 import "C"
 import "os"
 
-func main() int {
-	return int(C.main_impl(C.int(len(os.Args)), os.Args))
+func main() {
+	var c_args []*C.char
+	for i := range os.Args {
+		c_args = append(c_args, C.CString(os.Args[i]))
+	}
+	os.Exit(int(C.main_impl(C.int(len(os.Args)), &c_args[0])))
 }
