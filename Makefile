@@ -3,10 +3,10 @@
 
 include config.mk
 
-SRC = drw.c dwm.c util.c
+SRC = drw.c main.c util.c
 OBJ = ${SRC:.c=.o}
 
-all: options dwm
+all: options main
 
 options:
 	@echo dwm build options:
@@ -24,9 +24,9 @@ config.h:
 	@echo creating $@ from config.def.h
 	@cp config.def.h $@
 
-dwm: ${OBJ}
-	@echo CC -o $@
-	@${CC} -o $@ ${OBJ} ${LDFLAGS}
+main: ${OBJ}
+	@echo CC -o dwm
+	@${CC} -o dwm ${OBJ} ${LDFLAGS}
 
 clean:
 	@echo cleaning
