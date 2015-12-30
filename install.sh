@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
 PREFIX=/usr/local
+BUILD_DIR=$(mktemp -d)
 
-echo "Getting and building go-dwm."
-go get github.com/akesling/go-dwm
+cd ${BUILD_DIR}
 
-echo "Installing ${GOPATH}/bin/go-dwm to ${PREFIX}/bin/dwm"
-sudo cp -f ${GOPATH}/bin/go-dwm ${PREFIX}/bin/dwm
+echo "Getting and building go-dwm in ${BUILD_DIR}."
+go build github.com/akesling/go-dwm/cmd/go-dwm
+
+echo "Installing ${pwd}/bin/go-dwm to ${PREFIX}/bin/dwm"
+sudo cp -f go-dwm ${PREFIX}/bin/dwm
 sudo chmod 755 ${PREFIX}/bin/dwm
