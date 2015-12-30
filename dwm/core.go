@@ -1,4 +1,4 @@
-package main
+package dwm
 
 /*
 #cgo CFLAGS: -std=c99 -pedantic -Wall -Wno-deprecated-declarations
@@ -18,14 +18,11 @@ import (
 	"unsafe"
 )
 
-func main() {
-	c_args := goToCArgumentList(os.Args)
-	defer freeCArgs(c_args)
-
-	os.Exit(int(C.main_impl(C.int(len(os.Args)), c_args)))
+func MainImpl(argc int, argv **C.char) C.int {
+	return C.main_impl(C.int(argc), argv)
 }
 
-func goToCArgumentList(go_args []string) **C.char {
+func GoToCArgumentList(go_args []string) **C.char {
 	c_args := (**C.char)(C.malloc(C.size_t(len(go_args)) * sizeOfChar()))
 	for i := range os.Args {
 		*c_args = C.CString(os.Args[i])
@@ -33,7 +30,7 @@ func goToCArgumentList(go_args []string) **C.char {
 	return c_args
 }
 
-func freeCArgs(c_args **C.char) {
+func FreeCArgs(c_args **C.char) {
 	C.free(unsafe.Pointer(c_args))
 }
 
