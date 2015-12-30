@@ -1,5 +1,4 @@
 *.swp
 *.o
-dwm
 go-dwm
 _obj/
