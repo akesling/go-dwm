@@ -1,6 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 
-#define VERSION "7.1"
+#define VERSION "7.1.3"
 
 /* appearance */
 static const char font[]            = "-*-terminus-medium-r-*-*-16-*-*-*-*-*-*-*";
