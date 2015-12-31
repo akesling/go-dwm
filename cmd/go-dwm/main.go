@@ -9,5 +9,5 @@ func main() {
 	c_args := dwm.GoToCArgumentList(os.Args)
 	defer dwm.FreeCArgs(c_args)
 
-	os.Exit(int(dwm.MainImpl(len(os.Args), c_args)))
+	os.Exit(dwm.MainImpl(len(os.Args), c_args))
 }
