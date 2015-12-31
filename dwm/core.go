@@ -1,7 +1,7 @@
 package dwm
 
 /*
-#cgo CFLAGS: -std=c99 -pedantic -Wall -Wno-deprecated-declarations
+#cgo CFLAGS: -std=c99 -pedantic -Wno-deprecated-declarations
 #cgo CFLAGS: -Os -I/usr/X11R6/include
 #cgo CFLAGS: -D_BSD_SOURCE -D_POSIX_C_SOURCE=2 -DXINERAMA
 
@@ -10,6 +10,8 @@ package dwm
 #include "dwm.h"
 
 int main_impl(int argc, char* argv[]);
+void checkothervm(void);
+
 */
 import "C"
 
@@ -18,8 +20,14 @@ import (
 	"unsafe"
 )
 
-func MainImpl(argc int, argv **C.char) C.int {
-	return C.main_impl(C.int(argc), argv)
+func MainImpl(argc int, argv **C.char) int {
+	TestInitialization(argc, argv)
+	CheckOtherWM()
+	Setup()
+	Scan()
+	Run()
+	Cleanup()
+	return CloseWM()
 }
 
 func GoToCArgumentList(go_args []string) **C.char {
@@ -37,4 +45,32 @@ func FreeCArgs(c_args **C.char) {
 func sizeOfChar() C.size_t {
 	var b *C.char
 	return C.size_t(unsafe.Sizeof(b))
+}
+
+func TestInitialization(argc int, argv **C.char) {
+	C.test_initialization(C.int(argc), argv)
+}
+
+func CheckOtherWM() {
+	C.checkotherwm()
+}
+
+func Setup() {
+	C.setup()
+}
+
+func Scan() {
+	C.scan()
+}
+
+func Run() {
+	C.run()
+}
+
+func Cleanup() {
+	C.cleanup()
+}
+
+func CloseWM() int {
+	return int(C.close_wm())
 }

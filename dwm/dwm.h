@@ -148,8 +148,8 @@ static void arrangemon(Monitor *m);
 static void attach(Client *c);
 static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
-static void checkotherwm(void);
-static void cleanup(void);
+void checkotherwm(void);
+void cleanup(void);
 static void cleanupmon(Monitor *mon);
 static void clearurgent(Client *c);
 static void clientmessage(XEvent *e);
@@ -192,8 +192,8 @@ static void resize(Client *c, int x, int y, int w, int h, Bool interact);
 static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
-static void run(void);
-static void scan(void);
+void run(void);
+void scan(void);
 static Bool sendevent(Client *c, Atom proto);
 static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
@@ -201,7 +201,7 @@ static void setfocus(Client *c);
 static void setfullscreen(Client *c, Bool fullscreen);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
-static void setup(void);
+void setup(void);
 static void showhide(Client *c);
 static void sigchld(int unused);
 static void spawn(const Arg *arg);
@@ -2058,6 +2058,22 @@ main_impl(int argc, char *argv[]) {
 	scan();
 	run();
 	cleanup();
+	XCloseDisplay(dpy);
+	return EXIT_SUCCESS;
+}
+
+void test_initialization(int argc, char *argv[]) {
+	if(argc == 2 && !strcmp("-v", argv[1]))
+		die("go-dwm-"VERSION", © see LICENSE for details\n");
+	else if(argc != 1)
+		die("usage: dwm [-v]\n");
+	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
+		fputs("warning: no locale support\n", stderr);
+	if(!(dpy = XOpenDisplay(NULL)))
+		die("dwm: cannot open display\n");
+}
+
+int close_wm(void) {
 	XCloseDisplay(dpy);
 	return EXIT_SUCCESS;
 }
