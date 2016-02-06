@@ -14,8 +14,17 @@ void checkothervm(void);
 char* version() {
 	return VERSION;
 }
+
+XEvent* handlerWrapper(int);
+
 */
 import "C"
+
+import (
+	"bytes"
+	"encoding/binary"
+	"unsafe"
+)
 
 func TestInitialization() {
 	C.test_initialization()
@@ -34,7 +43,16 @@ func Scan() {
 }
 
 func Run() {
-	C.run()
+	var ev C.XEvent
+	C.XSync(C.dpy, C.False)
+
+	for C.running == C.True && C.XNextEvent(C.dpy, &ev) == 0 {
+		var event_type C.int
+		binary.Read(bytes.NewBuffer(ev[:unsafe.Sizeof(event_type)]), binary.LittleEndian, &event_type)
+		if C.handler[event_type] != nil {
+			C.handler[event_type](&ev)
+		}
+	}
 }
 
 func Cleanup() {
