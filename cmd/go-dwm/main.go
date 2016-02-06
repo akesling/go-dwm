@@ -1,13 +1,25 @@
 package main
 
 import (
+	"fmt"
 	"github.com/akesling/go-dwm/dwm"
 	"os"
 )
 
 func main() {
-	c_args := dwm.GoToCArgumentList(os.Args)
-	defer dwm.FreeCArgs(c_args)
+	if len(os.Args) == 2 && os.Args[1] == "-v" {
+		fmt.Printf("go-dwm-%s, © see LICENSE for details\n", dwm.Version())
+		os.Exit(0)
+	} else if len(os.Args) != 1 {
+		fmt.Print("usage: dwm [-v]\n")
+		os.Exit(1)
+	}
 
-	os.Exit(dwm.MainImpl(len(os.Args), c_args))
+	dwm.TestInitialization()
+	dwm.CheckOtherWM()
+	dwm.Setup()
+	dwm.Scan()
+	dwm.Run()
+	dwm.Cleanup()
+	os.Exit(dwm.CloseWM())
 }
