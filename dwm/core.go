@@ -9,46 +9,16 @@ package dwm
 
 #include "dwm.h"
 
-int main_impl(int argc, char* argv[]);
 void checkothervm(void);
 
+char* version() {
+	return VERSION;
+}
 */
 import "C"
 
-import (
-	"os"
-	"unsafe"
-)
-
-func MainImpl(argc int, argv **C.char) int {
-	TestInitialization(argc, argv)
-	CheckOtherWM()
-	Setup()
-	Scan()
-	Run()
-	Cleanup()
-	return CloseWM()
-}
-
-func GoToCArgumentList(go_args []string) **C.char {
-	c_args := (**C.char)(C.malloc(C.size_t(len(go_args)) * sizeOfChar()))
-	for i := range os.Args {
-		*c_args = C.CString(os.Args[i])
-	}
-	return c_args
-}
-
-func FreeCArgs(c_args **C.char) {
-	C.free(unsafe.Pointer(c_args))
-}
-
-func sizeOfChar() C.size_t {
-	var b *C.char
-	return C.size_t(unsafe.Sizeof(b))
-}
-
-func TestInitialization(argc int, argv **C.char) {
-	C.test_initialization(C.int(argc), argv)
+func TestInitialization() {
+	C.test_initialization()
 }
 
 func CheckOtherWM() {
@@ -73,4 +43,8 @@ func Cleanup() {
 
 func CloseWM() int {
 	return int(C.close_wm())
+}
+
+func Version() string {
+	return C.GoString(C.version())
 }
