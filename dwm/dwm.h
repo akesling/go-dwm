@@ -241,7 +241,7 @@ static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
-static void (*handler[LASTEvent]) (XEvent *) = {
+void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ClientMessage] = clientmessage,
 	[ConfigureRequest] = configurerequest,
@@ -258,10 +258,10 @@ static void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 static Atom wmatom[WMLast], netatom[NetLast];
-static Bool running = True;
+Bool running = True;
 static Cur *cursor[CurLast];
 static ClrScheme scheme[SchemeLast];
-static Display *dpy;
+Display *dpy;
 static Drw *drw;
 static Fnt *fnt;
 static Monitor *mons, *selmon;
