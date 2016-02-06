@@ -2043,30 +2043,7 @@ zoom(const Arg *arg) {
 	pop(c);
 }
 
-int
-main_impl(int argc, char *argv[]) {
-	if(argc == 2 && !strcmp("-v", argv[1]))
-		die("go-dwm-"VERSION", © see LICENSE for details\n");
-	else if(argc != 1)
-		die("usage: dwm [-v]\n");
-	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
-		fputs("warning: no locale support\n", stderr);
-	if(!(dpy = XOpenDisplay(NULL)))
-		die("dwm: cannot open display\n");
-	checkotherwm();
-	setup();
-	scan();
-	run();
-	cleanup();
-	XCloseDisplay(dpy);
-	return EXIT_SUCCESS;
-}
-
-void test_initialization(int argc, char *argv[]) {
-	if(argc == 2 && !strcmp("-v", argv[1]))
-		die("go-dwm-"VERSION", © see LICENSE for details\n");
-	else if(argc != 1)
-		die("usage: dwm [-v]\n");
+void test_initialization() {
 	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
 	if(!(dpy = XOpenDisplay(NULL)))
