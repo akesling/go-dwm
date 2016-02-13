@@ -15,7 +15,9 @@ char* version() {
 	return VERSION;
 }
 
-XEvent* handlerWrapper(int);
+void invokeEventHandler(int type, XEvent* e) {
+	handler[type](e);
+}
 
 */
 import "C"
@@ -50,7 +52,7 @@ func Run() {
 		var event_type C.int
 		binary.Read(bytes.NewBuffer(ev[:unsafe.Sizeof(event_type)]), binary.LittleEndian, &event_type)
 		if C.handler[event_type] != nil {
-			C.handler[event_type](&ev)
+			C.invokeEventHandler(event_type, &ev)
 		}
 	}
 }
