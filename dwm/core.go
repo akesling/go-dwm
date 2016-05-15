@@ -1,7 +1,7 @@
 package dwm
 
 /*
-#cgo CFLAGS: -std=c99 -pedantic -Wno-deprecated-declarations
+#cgo CFLAGS: -std=c99 -pedantic -Wno-deprecated-declarations -Wno-unused -Wno-unused-parameter
 #cgo CFLAGS: -Os -I/usr/X11R6/include
 #cgo CFLAGS: -D_BSD_SOURCE -D_POSIX_C_SOURCE=2 -DXINERAMA
 
@@ -51,7 +51,7 @@ func Run() {
 	for C.running == C.True && C.XNextEvent(C.dpy, &ev) == 0 {
 		var event_type C.int
 		binary.Read(bytes.NewBuffer(ev[:unsafe.Sizeof(event_type)]), binary.LittleEndian, &event_type)
-		if C.handler[event_type] != nil {
+		if event_type < C.LASTEvent && C.handler[event_type] != nil {
 			C.invokeEventHandler(event_type, &ev)
 		}
 	}
