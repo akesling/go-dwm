@@ -2023,8 +2023,3 @@ void test_initialization() {
 	if(!(dpy = XOpenDisplay(NULL)))
 		die("dwm: cannot open display\n");
 }
-
-int close_wm(void) {
-	XCloseDisplay(dpy);
-	return EXIT_SUCCESS;
-}

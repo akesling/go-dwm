@@ -91,7 +91,8 @@ func Cleanup() {
 }
 
 func CloseWM() int {
-	return int(C.close_wm())
+	C.XCloseDisplay(C.dpy)
+	return int(C.EXIT_SUCCESS)
 }
 
 func Version() string {
