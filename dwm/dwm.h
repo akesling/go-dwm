@@ -147,26 +147,26 @@ static void arrange(Monitor *m);
 static void arrangemon(Monitor *m);
 static void attach(Client *c);
 static void attachstack(Client *c);
-static void buttonpress(XEvent *e);
+void buttonpress(XEvent *e);
 void checkotherwm(void);
 void cleanup(void);
 static void cleanupmon(Monitor *mon);
 static void clearurgent(Client *c);
-static void clientmessage(XEvent *e);
+void clientmessage(XEvent *e);
 static void configure(Client *c);
-static void configurenotify(XEvent *e);
-static void configurerequest(XEvent *e);
+void configurenotify(XEvent *e);
+void configurerequest(XEvent *e);
 static Monitor *createmon(void);
-static void destroynotify(XEvent *e);
+void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
 static Monitor *dirtomon(int dir);
 static void drawbar(Monitor *m);
 static void drawbars(void);
-static void enternotify(XEvent *e);
-static void expose(XEvent *e);
+void enternotify(XEvent *e);
+void expose(XEvent *e);
 static void focus(Client *c);
-static void focusin(XEvent *e);
+void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Bool getrootptr(int *x, int *y);
@@ -175,24 +175,23 @@ static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
 static void grabkeys(void);
 static void incnmaster(const Arg *arg);
-static void keypress(XEvent *e);
+void keypress(XEvent *e);
 static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
-static void mappingnotify(XEvent *e);
-static void maprequest(XEvent *e);
+void mappingnotify(XEvent *e);
+void maprequest(XEvent *e);
 static void monocle(Monitor *m);
-static void motionnotify(XEvent *e);
+void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void pop(Client *);
-static void propertynotify(XEvent *e);
+void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 static Monitor *recttomon(int x, int y, int w, int h);
 static void resize(Client *c, int x, int y, int w, int h, Bool interact);
 static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
-void run(void);
 void scan(void);
 static Bool sendevent(Client *c, Atom proto);
 static void sendmon(Client *c, Monitor *m);
@@ -214,7 +213,7 @@ static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unfocus(Client *c, Bool setfocus);
 static void unmanage(Client *c, Bool destroyed);
-static void unmapnotify(XEvent *e);
+void unmapnotify(XEvent *e);
 static Bool updategeom(void);
 static void updatebarpos(Monitor *m);
 static void updatebars(void);
@@ -241,27 +240,12 @@ static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
-static void (*handler[LASTEvent]) (XEvent *) = {
-	[ButtonPress] = buttonpress,
-	[ClientMessage] = clientmessage,
-	[ConfigureRequest] = configurerequest,
-	[ConfigureNotify] = configurenotify,
-	[DestroyNotify] = destroynotify,
-	[EnterNotify] = enternotify,
-	[Expose] = expose,
-	[FocusIn] = focusin,
-	[KeyPress] = keypress,
-	[MappingNotify] = mappingnotify,
-	[MapRequest] = maprequest,
-	[MotionNotify] = motionnotify,
-	[PropertyNotify] = propertynotify,
-	[UnmapNotify] = unmapnotify
-};
+void Handler(int event_type, XEvent* ev);
 static Atom wmatom[WMLast], netatom[NetLast];
-static Bool running = True;
+Bool running = True;
 static Cur *cursor[CurLast];
 static ClrScheme scheme[SchemeLast];
-static Display *dpy;
+Display *dpy;
 static Drw *drw;
 static Fnt *fnt;
 static Monitor *mons, *selmon;
@@ -1142,7 +1126,7 @@ movemouse(const Arg *arg) {
 		case ConfigureRequest:
 		case Expose:
 		case MapRequest:
-			handler[ev.type](&ev);
+            Handler(ev.type, &ev);
 			break;
 		case MotionNotify:
 			nx = ocx + (ev.xmotion.x - x);
@@ -1287,7 +1271,7 @@ resizemouse(const Arg *arg) {
 		case ConfigureRequest:
 		case Expose:
 		case MapRequest:
-			handler[ev.type](&ev);
+            Handler(ev.type, &ev);
 			break;
 		case MotionNotify:
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
@@ -1336,16 +1320,6 @@ restack(Monitor *m) {
 	}
 	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-}
-
-void
-run(void) {
-	XEvent ev;
-	/* main event loop */
-	XSync(dpy, False);
-	while(running && !XNextEvent(dpy, &ev))
-		if(handler[ev.type])
-			handler[ev.type](&ev); /* call handler */
 }
 
 void
