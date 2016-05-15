@@ -15,9 +15,6 @@ char* version() {
 	return VERSION;
 }
 
-void invokeEventHandler(int type, XEvent* e) {
-	handler[type](e);
-}
 */
 import "C"
 
@@ -28,8 +25,35 @@ import (
 )
 
 func invokeEventHandler(event_type C.int, event *C.XEvent) {
-	if C.handler[event_type] != nil {
-		C.invokeEventHandler(event_type, event)
+	switch event_type {
+	case C.ButtonPress:
+		C.buttonpress(event)
+	case C.ClientMessage:
+		C.clientmessage(event)
+	case C.ConfigureRequest:
+		C.configurerequest(event)
+	case C.ConfigureNotify:
+		C.configurenotify(event)
+	case C.DestroyNotify:
+		C.destroynotify(event)
+	case C.EnterNotify:
+		C.enternotify(event)
+	case C.Expose:
+		C.expose(event)
+	case C.FocusIn:
+		C.focusin(event)
+	case C.KeyPress:
+		C.keypress(event)
+	case C.MappingNotify:
+		C.mappingnotify(event)
+	case C.MapRequest:
+		C.maprequest(event)
+	case C.MotionNotify:
+		C.motionnotify(event)
+	case C.PropertyNotify:
+		C.propertynotify(event)
+	case C.UnmapNotify:
+		C.unmapnotify(event)
 	}
 }
 
