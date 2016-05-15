@@ -1,0 +1,16 @@
+package dwm
+
+/*
+#include <X11/Xlib.h>
+
+extern void Handler(int event_type, XEvent* event);
+*/
+import "C"
+
+// This function exists in its own file to allow import into C.  The preamble
+// for a Cgo file is included multiple times, so it can't have definitions (as
+// we need to in order to interact with dwm.h).
+//export Handler
+func Handler(event_type C.int, event *C.XEvent) {
+	invokeEventHandler(event_type, event)
+}
