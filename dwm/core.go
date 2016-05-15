@@ -15,6 +15,18 @@ char* version() {
 	return VERSION;
 }
 
+void set_start_x_error_handler() {
+	xerrorxlib = XSetErrorHandler(xerrorstart);
+}
+
+void set_x_error_handler() {
+	XSetErrorHandler(xerror);
+}
+
+Window get_default_root_window(Display* display) {
+	return DefaultRootWindow(display);
+}
+
 */
 import "C"
 
@@ -62,7 +74,13 @@ func TestInitialization() {
 }
 
 func CheckOtherWM() {
-	C.checkotherwm()
+	//	C.checkotherwm()
+	C.set_start_x_error_handler()
+	// this causes an error if some other window manager is running
+	C.XSelectInput(C.dpy, C.get_default_root_window(C.dpy), C.SubstructureRedirectMask)
+	C.XSync(C.dpy, C.False)
+	C.set_x_error_handler()
+	C.XSync(C.dpy, C.False)
 }
 
 func Setup() {
