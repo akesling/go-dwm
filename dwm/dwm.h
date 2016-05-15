@@ -240,6 +240,7 @@ static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
+void go_handler(int event_type, XEvent* ev);
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ClientMessage] = clientmessage,
@@ -256,6 +257,9 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[PropertyNotify] = propertynotify,
 	[UnmapNotify] = unmapnotify
 };
+void go_handler(int event_type, XEvent* ev) {
+    handler[event_type](ev);
+}
 static Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 static Cur *cursor[CurLast];
@@ -1141,7 +1145,7 @@ movemouse(const Arg *arg) {
 		case ConfigureRequest:
 		case Expose:
 		case MapRequest:
-			handler[ev.type](&ev);
+            go_handler(ev.type, &ev);
 			break;
 		case MotionNotify:
 			nx = ocx + (ev.xmotion.x - x);
@@ -1286,7 +1290,7 @@ resizemouse(const Arg *arg) {
 		case ConfigureRequest:
 		case Expose:
 		case MapRequest:
-			handler[ev.type](&ev);
+            go_handler(ev.type, &ev);
 			break;
 		case MotionNotify:
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
