@@ -33,6 +33,7 @@ import "C"
 import (
 	"bytes"
 	"encoding/binary"
+	"os"
 	"unsafe"
 )
 
@@ -70,11 +71,16 @@ func invokeEventHandler(event_type C.int, event *C.XEvent) {
 }
 
 func TestInitialization() {
-	C.test_initialization()
+	if C.setlocale(C.LC_CTYPE, C.CString("")) == nil || C.XSupportsLocale() == 0 {
+		os.Stderr.WriteString("warning: no locale support\n")
+	}
+
+	if C.dpy = C.XOpenDisplay(nil); C.dpy == nil {
+		panic("dwm: cannot open display\n")
+	}
 }
 
 func CheckOtherWM() {
-	//	C.checkotherwm()
 	C.set_start_x_error_handler()
 	// this causes an error if some other window manager is running
 	C.XSelectInput(C.dpy, C.get_default_root_window(C.dpy), C.SubstructureRedirectMask)

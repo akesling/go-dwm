@@ -2006,10 +2006,3 @@ zoom(const Arg *arg) {
 			return;
 	pop(c);
 }
-
-void test_initialization() {
-	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
-		fputs("warning: no locale support\n", stderr);
-	if(!(dpy = XOpenDisplay(NULL)))
-		die("dwm: cannot open display\n");
-}
