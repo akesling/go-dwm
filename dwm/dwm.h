@@ -241,22 +241,6 @@ static int bh, blw = 0;      /* bar geometry */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
 void Handler(int event_type, XEvent* ev);
-void (*handler[LASTEvent]) (XEvent *) = {
-	[ButtonPress] = buttonpress,
-	[ClientMessage] = clientmessage,
-	[ConfigureRequest] = configurerequest,
-	[ConfigureNotify] = configurenotify,
-	[DestroyNotify] = destroynotify,
-	[EnterNotify] = enternotify,
-	[Expose] = expose,
-	[FocusIn] = focusin,
-	[KeyPress] = keypress,
-	[MappingNotify] = mappingnotify,
-	[MapRequest] = maprequest,
-	[MotionNotify] = motionnotify,
-	[PropertyNotify] = propertynotify,
-	[UnmapNotify] = unmapnotify
-};
 static Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 static Cur *cursor[CurLast];
