@@ -15,6 +15,9 @@ char* version() {
 	return VERSION;
 }
 
+void invokeEventHandler(int type, XEvent* e) {
+	handler[type](e);
+}
 */
 import "C"
 
@@ -23,6 +26,12 @@ import (
 	"encoding/binary"
 	"unsafe"
 )
+
+func invokeEventHandler(event_type C.int, event *C.XEvent) {
+	if C.handler[event_type] != nil {
+		C.invokeEventHandler(event_type, event)
+	}
+}
 
 func TestInitialization() {
 	C.test_initialization()
@@ -47,8 +56,8 @@ func Run() {
 	for C.running == C.True && C.XNextEvent(C.dpy, &ev) == 0 {
 		var event_type C.int
 		binary.Read(bytes.NewBuffer(ev[:unsafe.Sizeof(event_type)]), binary.LittleEndian, &event_type)
-		if event_type < C.LASTEvent && C.handler[event_type] != nil {
-			C.go_handler(event_type, &ev)
+		if event_type < C.LASTEvent {
+			Handler(event_type, &ev)
 		}
 	}
 }
