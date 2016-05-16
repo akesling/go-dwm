@@ -33,6 +33,7 @@ import "C"
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/akesling/go-dwm/X"
 	"os"
 	"unsafe"
 )
@@ -84,9 +85,9 @@ func CheckOtherWM() {
 	C.set_start_x_error_handler()
 	// this causes an error if some other window manager is running
 	C.XSelectInput(C.dpy, C.get_default_root_window(C.dpy), C.SubstructureRedirectMask)
-	C.XSync(C.dpy, C.False)
+	X.Sync((*X.Display)(C.dpy), false)
 	C.set_x_error_handler()
-	C.XSync(C.dpy, C.False)
+	X.Sync((*X.Display)(C.dpy), false)
 }
 
 func Setup() {
@@ -99,7 +100,7 @@ func Scan() {
 
 func Run() {
 	var ev C.XEvent
-	C.XSync(C.dpy, C.False)
+	X.Sync((*X.Display)(C.dpy), false)
 
 	for C.running == C.True && C.XNextEvent(C.dpy, &ev) == 0 {
 		var event_type C.int
