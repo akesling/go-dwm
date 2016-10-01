@@ -43,7 +43,7 @@ HERE_DOC
 
 function roll_up_dev_changes_into_master_commit() {
     change_branch_to_master
-    git merge --no-ff dev -m ${COMMIT_MESSAGE}
+    git merge --no-ff dev -m "${COMMIT_MESSAGE}"
 }
 
 function ask_user_whether_to_continue_or_exit() {
@@ -88,23 +88,23 @@ HERE_DOC
 ################################################################################
 
 function release_script_main() {
-    if [ -z $(gather_revision_notes) ]; then
+    if [ -z "$(gather_revision_notes)" ]; then
         echo "Version up to date with dev branch."
         exit 0
     fi
 
     echo "Gathering revision notes."
-    REVISION_NOTES=$(gather_revision_notes)
+    REVISION_NOTES="$(gather_revision_notes)"
     change_branch_to_master
 
     echo "Determining old version."
-    OLD_VERSION=$(determine_old_version)
+    OLD_VERSION="$(determine_old_version)"
 
     echo "Please provide new version number.  Old version was ${OLD_VERSION}."
-    NEW_VERSION=$(prompt_for_input)
+    NEW_VERSION="$(prompt_for_input)"
 
     echo "Generating commit message from revision notes, old version, and new version."
-    COMMIT_MESSAGE=$(generate_commit_message ${REVISION_NOTES} ${OLD_VERSION} ${NEW_VERSION})
+    COMMIT_MESSAGE=$(generate_commit_message "${REVISION_NOTES}" "${OLD_VERSION}" "${NEW_VERSION}")
 
     echo "Commit message for version merge from dev branch is as follows:"
     echo "\"\"\""
@@ -120,7 +120,7 @@ function release_script_main() {
     echo "Rewriting version from ${OLD_VERSION} to ${NEW_VERSION} in ${CONFIG_FILE}."
     CONFIG_FILE=./dwm/config.h
     TMP_CONFIG=mktemp
-    write_new_version_to_config_file ${NEW_VERSION} ${CONFIG_FILE} ${TMP_CONFIG}
+    write_new_version_to_config_file "${NEW_VERSION}" "${CONFIG_FILE}" "${TMP_CONFIG}"
 
     echo "Verifying new version of ${CONFIG_FILE} looks as expected."
     exit_if_new_config_file_doesnt_look_right
@@ -131,7 +131,7 @@ function release_script_main() {
     git commit -m "Update version to ${NEW_VERSION}"
 
     echo "Creating tag for version ${NEW_VERSION}"
-    git tag -a ${NEW_VERSION} -m "Update version to ${NEW_VERSION}"
+    git tag -a "${NEW_VERSION}" -m "Update version to ${NEW_VERSION}"
 
     echo "Version updated to ${NEW_VERSION}, rolled up from dev branch, and tagged."
 }
