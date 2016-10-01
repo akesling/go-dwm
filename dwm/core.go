@@ -33,7 +33,7 @@ import "C"
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/akesling/go-dwm/X"
+	"github.com/akesling/gox/X"
 	"os"
 	"unsafe"
 )
