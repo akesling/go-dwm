@@ -31,11 +31,8 @@ Window get_default_root_window(Display* display) {
 import "C"
 
 import (
-	"bytes"
-	"encoding/binary"
 	"github.com/akesling/gox/X"
 	"os"
-	"unsafe"
 )
 
 func invokeEventHandler(event_type int, event *X.Event) {
@@ -84,14 +81,14 @@ func TestInitialization() {
 
 func CheckOtherWM() {
 	C.set_start_x_error_handler()
+	dpy := (*X.Display)(C.dpy);
 	// this causes an error if some other window manager is running
-	X.SelectInput(
-		(*X.Display)(C.dpy),
+	dpy.SelectInput(
 		(X.Window)(C.get_default_root_window(C.dpy)),
 		int64(C.SubstructureRedirectMask))
-	X.Sync((*X.Display)(C.dpy), false)
+	dpy.Sync(false)
 	C.set_x_error_handler()
-	X.Sync((*X.Display)(C.dpy), false)
+	dpy.Sync(false)
 }
 
 func Setup() {
@@ -103,14 +100,15 @@ func Scan() {
 }
 
 func Run() {
-	var ev X.Event
-	X.Sync((*X.Display)(C.dpy), false)
+	dpy := (*X.Display)(C.dpy);
 
-	for C.running == C.True && X.NextEvent((*X.Display)(C.dpy), &ev) == 0 {
-		var event_type C.int
-		binary.Read(bytes.NewBuffer(ev[:unsafe.Sizeof(event_type)]), binary.LittleEndian, &event_type)
-		if event_type < C.LASTEvent {
-			invokeEventHandler(int(event_type), &ev);
+	dpy.Sync(false)
+
+	var ev X.Event
+	for C.running == C.True && dpy.NextEvent(&ev) == 0 {
+		eventType := ev.EventType()
+		if eventType < int(C.LASTEvent) {
+			invokeEventHandler(eventType, &ev);
 		}
 	}
 }
@@ -120,7 +118,7 @@ func Cleanup() {
 }
 
 func CloseWM() int {
-	X.CloseDisplay((*X.Display)(C.dpy))
+	(*X.Display)(C.dpy).CloseDisplay()
 	return int(C.EXIT_SUCCESS)
 }
 
