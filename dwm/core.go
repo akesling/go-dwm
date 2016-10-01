@@ -35,7 +35,11 @@ import (
 	"os"
 )
 
-func invokeEventHandler(event_type int, event *X.Event) {
+type EventHandler func(int, *X.Event)
+
+var currentEventHandler EventHandler = dwmEventHandler
+
+func dwmEventHandler(event_type int, event *X.Event) {
 	var cEventType C.int = C.int(event_type)
 	switch cEventType {
 	case C.ButtonPress:
@@ -67,6 +71,18 @@ func invokeEventHandler(event_type int, event *X.Event) {
 	case C.UnmapNotify:
 		C.unmapnotify((*C.XEvent)(event))
 	}
+}
+
+func invokeEventHandler(eventType int, event *X.Event) {
+	currentEventHandler(eventType, event)
+}
+
+func SetEventHandler(newHandler EventHandler) {
+	currentEventHandler = newHandler
+}
+
+func GetEventHandler() EventHandler {
+	return currentEventHandler
 }
 
 func TestInitialization() {
