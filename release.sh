@@ -4,6 +4,13 @@
 ## Component Functions #########################################################
 ################################################################################
 
+trap "exit 1" TERM
+export SCRIPT_CONTEXT=$$
+
+function exit_script() {
+    kill -s TERM ${SCRIPT_CONTEXT}
+}
+
 function gather_revision_notes() {
     git log master...dev --pretty=format:'*) %s'
 }
@@ -57,9 +64,9 @@ function ask_user_whether_to_continue_or_exit() {
 }
 
 function write_new_version_to_config_file() {
-    local NEW_VERSION=$1
-    local CONFIG_FILE=$1
-    local TMP_CONFIG=$1
+    local NEW_VERSION="$1"
+    local CONFIG_FILE="$2"
+    local TMP_CONFIG="$3"
     cat ${CONFIG_FILE} |
         sed -e "s/\(\#define VERSION \"\)[.0-9]*\(\"\)/\1${NEW_VERSION}\2/" > ${TMP_CONFIG}
 }
@@ -73,7 +80,7 @@ function exit_if_new_config_file_doesnt_look_right() {
 HERE_DOC
 )
     local ACTUAL_CONFIG_DIFF=$(diff ${CONFIG_FILE} ${TMP_CONFIG})
-    if [ "${EXPECTED_CONFIG_DIFF}" -ne "${ACTUAL_CONFIG_DIFF}" ]; then
+    if [ "${EXPECTED_CONFIG_DIFF}" != "${ACTUAL_CONFIG_DIFF}" ]; then
         echo "Generated configuration did not match expectation"
         echo "Expected:"
         echo "${EXPECTED_CONFIG_DIFF}"
@@ -114,17 +121,17 @@ function release_script_main() {
 
     ask_user_whether_to_continue_or_exit
 
-    echo "Rolling up dev changes into commit."
-    roll_up_dev_changes_into_master_commit
-
-    echo "Rewriting version from ${OLD_VERSION} to ${NEW_VERSION} in ${CONFIG_FILE}."
     CONFIG_FILE=./dwm/config.h
-    TMP_CONFIG=mktemp
+    echo "Rewriting version from ${OLD_VERSION} to ${NEW_VERSION} in ${CONFIG_FILE}."
+    TMP_CONFIG=$(mktemp)
     write_new_version_to_config_file "${NEW_VERSION}" "${CONFIG_FILE}" "${TMP_CONFIG}"
 
     echo "Verifying new version of ${CONFIG_FILE} looks as expected."
     exit_if_new_config_file_doesnt_look_right
     mv ${TMP_CONFIG} ${CONFIG_FILE}
+
+    echo "Rolling up dev changes into commit."
+    roll_up_dev_changes_into_master_commit
 
     echo "Committing new versioned config."
     git add ${CONFIG_FILE}

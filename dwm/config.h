@@ -1,6 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 
-#define VERSION "7.1.9"
+#define VERSION "7.1.14"
 
 /* appearance */
 static const char font[]            = "-*-terminus-medium-r-*-*-16-*-*-*-*-*-*-*";
@@ -109,4 +109,3 @@ static Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
-
