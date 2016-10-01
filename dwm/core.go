@@ -38,45 +38,46 @@ import (
 	"unsafe"
 )
 
-func invokeEventHandler(event_type C.int, event *C.XEvent) {
-	switch event_type {
+func invokeEventHandler(event_type int, event *X.Event) {
+	var cEventType C.int = C.int(event_type)
+	switch cEventType {
 	case C.ButtonPress:
-		C.buttonpress(event)
+		C.buttonpress((*C.XEvent)(event))
 	case C.ClientMessage:
-		C.clientmessage(event)
+		C.clientmessage((*C.XEvent)(event))
 	case C.ConfigureRequest:
-		C.configurerequest(event)
+		C.configurerequest((*C.XEvent)(event))
 	case C.ConfigureNotify:
-		C.configurenotify(event)
+		C.configurenotify((*C.XEvent)(event))
 	case C.DestroyNotify:
-		C.destroynotify(event)
+		C.destroynotify((*C.XEvent)(event))
 	case C.EnterNotify:
-		C.enternotify(event)
+		C.enternotify((*C.XEvent)(event))
 	case C.Expose:
-		C.expose(event)
+		C.expose((*C.XEvent)(event))
 	case C.FocusIn:
-		C.focusin(event)
+		C.focusin((*C.XEvent)(event))
 	case C.KeyPress:
-		C.keypress(event)
+		C.keypress((*C.XEvent)(event))
 	case C.MappingNotify:
-		C.mappingnotify(event)
+		C.mappingnotify((*C.XEvent)(event))
 	case C.MapRequest:
-		C.maprequest(event)
+		C.maprequest((*C.XEvent)(event))
 	case C.MotionNotify:
-		C.motionnotify(event)
+		C.motionnotify((*C.XEvent)(event))
 	case C.PropertyNotify:
-		C.propertynotify(event)
+		C.propertynotify((*C.XEvent)(event))
 	case C.UnmapNotify:
-		C.unmapnotify(event)
+		C.unmapnotify((*C.XEvent)(event))
 	}
 }
 
 func TestInitialization() {
-	if C.setlocale(C.LC_CTYPE, C.CString("")) == nil || C.XSupportsLocale() == 0 {
+	if C.setlocale(C.LC_CTYPE, C.CString("")) == nil || X.SupportsLocale() == 0 {
 		os.Stderr.WriteString("warning: no locale support\n")
 	}
 
-	if C.dpy = C.XOpenDisplay(nil); C.dpy == nil {
+	if C.dpy = (*C.Display)(X.OpenDisplay(nil)); C.dpy == nil {
 		panic("dwm: cannot open display\n")
 	}
 }
@@ -84,7 +85,10 @@ func TestInitialization() {
 func CheckOtherWM() {
 	C.set_start_x_error_handler()
 	// this causes an error if some other window manager is running
-	C.XSelectInput(C.dpy, C.get_default_root_window(C.dpy), C.SubstructureRedirectMask)
+	X.SelectInput(
+		(*X.Display)(C.dpy),
+		(X.Window)(C.get_default_root_window(C.dpy)),
+		int64(C.SubstructureRedirectMask))
 	X.Sync((*X.Display)(C.dpy), false)
 	C.set_x_error_handler()
 	X.Sync((*X.Display)(C.dpy), false)
@@ -99,14 +103,14 @@ func Scan() {
 }
 
 func Run() {
-	var ev C.XEvent
+	var ev X.Event
 	X.Sync((*X.Display)(C.dpy), false)
 
-	for C.running == C.True && C.XNextEvent(C.dpy, &ev) == 0 {
+	for C.running == C.True && X.NextEvent((*X.Display)(C.dpy), &ev) == 0 {
 		var event_type C.int
 		binary.Read(bytes.NewBuffer(ev[:unsafe.Sizeof(event_type)]), binary.LittleEndian, &event_type)
 		if event_type < C.LASTEvent {
-			Handler(event_type, &ev)
+			invokeEventHandler(int(event_type), &ev);
 		}
 	}
 }
@@ -116,7 +120,7 @@ func Cleanup() {
 }
 
 func CloseWM() int {
-	C.XCloseDisplay(C.dpy)
+	X.CloseDisplay((*X.Display)(C.dpy))
 	return int(C.EXIT_SUCCESS)
 }
 
