@@ -148,6 +148,7 @@ static void arrangemon(Monitor *m);
 static void attach(Client *c);
 static void attachstack(Client *c);
 void buttonpress(XEvent *e);
+void checkotherwm(void);
 void cleanup(void);
 static void cleanupmon(Monitor *mon);
 static void clearurgent(Client *c);
