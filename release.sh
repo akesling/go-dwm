@@ -59,7 +59,7 @@ function ask_user_whether_to_continue_or_exit() {
 
     if [ ${AFFIRM:-Y} = 'n' ]; then
         printf "Commit message rejected, aborting"
-        exit 1
+        exit_script
     fi
 }
 
@@ -86,7 +86,7 @@ HERE_DOC
         echo "${EXPECTED_CONFIG_DIFF}"
         echo "Got:"
         echo "${ACTUAL_CONFIG_DIFF}"
-        exit 1
+        exit_script
     fi
 }
 

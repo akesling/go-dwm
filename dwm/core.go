@@ -104,10 +104,6 @@ func CheckOtherWM() {
 	dpy.Sync(false)
 	C.set_x_error_handler()
 	dpy.Sync(false)
-=======
-	"bytes"
-	"encoding/binary"
-	"unsafe"
 )
 
 func invokeEventHandler(event_type C.int, event *C.XEvent) {
