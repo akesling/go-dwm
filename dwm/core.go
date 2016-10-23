@@ -11,10 +11,6 @@ package dwm
 
 void checkothervm(void);
 
-char* version() {
-	return VERSION;
-}
-
 void set_start_x_error_handler() {
 	xerrorxlib = XSetErrorHandler(xerrorstart);
 }
@@ -37,6 +33,11 @@ import (
 type EventHandler func(int, *X.Event)
 
 var currentEventHandler EventHandler = dwmEventHandler
+
+//go:generate bash update_version.sh ${GOFILE}
+//go:generate git add ${GOFILE}
+var version string = "7.1.16"
+var name string = "go-dwm"
 
 func dwmEventHandler(event_type int, event *X.Event) {
 	var cEventType C.int = C.int(event_type)
@@ -138,5 +139,17 @@ func CloseWM() int {
 }
 
 func Version() string {
-	return C.GoString(C.version())
+	return version
+}
+
+func SetVersion(v string) {
+	version = v
+}
+
+func Name() string {
+	return name
+}
+
+func SetName(n string) {
+	name = n
 }
