@@ -18,3 +18,8 @@ import (
 func Handler(event_type C.int, event *C.XEvent) {
 	invokeEventHandler(int(event_type), (*X.Event)(event))
 }
+
+//export wm_version_name
+func wm_version_name() *C.char {
+	return C.CString(Name() + "-" + Version())
+}

@@ -8,7 +8,7 @@ import (
 
 func main() {
 	if len(os.Args) == 2 && os.Args[1] == "-v" {
-		fmt.Printf("go-dwm-%s, © see LICENSE for details\n", dwm.Version())
+		fmt.Printf("%s, © see LICENSE for details\n", dwm.Name() + "-" + dwm.Version())
 		os.Exit(0)
 	} else if len(os.Args) != 1 {
 		fmt.Print("usage: dwm [-v]\n")

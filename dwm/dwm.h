@@ -240,7 +240,6 @@ static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
-void Handler(int event_type, XEvent* ev);
 static Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 static Cur *cursor[CurLast];
@@ -250,6 +249,9 @@ static Drw *drw;
 static Fnt *fnt;
 static Monitor *mons, *selmon;
 static Window root;
+
+void Handler(int event_type, XEvent* ev);
+char* wm_version_name();
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -1887,8 +1889,10 @@ updatetitle(Client *c) {
 
 void
 updatestatus(void) {
+    char* version_name = wm_version_name();
 	if(!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
-		strcpy(stext, "go-dwm-"VERSION);
+		strcpy(stext, version_name);
+    free(version_name);
 	drawbar(selmon);
 }
 

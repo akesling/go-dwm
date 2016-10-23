@@ -1,7 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-#define VERSION "7.1.14"
-
 /* appearance */
 static const char font[]            = "-*-terminus-medium-r-*-*-16-*-*-*-*-*-*-*";
 static const char normbordercolor[] = "#444444";
