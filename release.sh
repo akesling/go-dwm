@@ -21,13 +21,6 @@ function change_branch_to_master() {
     fi
 }
 
-function determine_old_version() {
-    cat ./dwm/config.h | \
-        grep '#define VERSION' | \
-        cut -d' ' -f3 | \
-        sed -e 's/"//g'
-}
-
 function prompt_for_input() {
     local NEW_VERSION
     read -p'> ' NEW_VERSION
@@ -35,9 +28,9 @@ function prompt_for_input() {
 }
 
 function generate_commit_message() {
-    local REVISION_NOTES=$1
-    local OLD_VERSION=$2
-    local NEW_VERSION=$3
+    local REVISION_NOTES="$1"
+    local OLD_VERSION="$2"
+    local NEW_VERSION="$3"
     cat <<HERE_DOC
 Merge for version ${NEW_VERSION} update
 
@@ -63,38 +56,13 @@ function ask_user_whether_to_continue_or_exit() {
     fi
 }
 
-function write_new_version_to_config_file() {
-    local NEW_VERSION="$1"
-    local CONFIG_FILE="$2"
-    local TMP_CONFIG="$3"
-    cat ${CONFIG_FILE} |
-        sed -e "s/\(\#define VERSION \"\)[.0-9]*\(\"\)/\1${NEW_VERSION}\2/" > ${TMP_CONFIG}
-}
-
-function exit_if_new_config_file_doesnt_look_right() {
-    local EXPECTED_CONFIG_DIFF=$(cat <<HERE_DOC
-3c3
-< #define VERSION "${OLD_VERSION}"
----
-> #define VERSION "${NEW_VERSION}"
-HERE_DOC
-)
-    local ACTUAL_CONFIG_DIFF=$(diff ${CONFIG_FILE} ${TMP_CONFIG})
-    if [ "${EXPECTED_CONFIG_DIFF}" != "${ACTUAL_CONFIG_DIFF}" ]; then
-        echo "Generated configuration did not match expectation"
-        echo "Expected:"
-        echo "${EXPECTED_CONFIG_DIFF}"
-        echo "Got:"
-        echo "${ACTUAL_CONFIG_DIFF}"
-        exit_script
-    fi
-}
-
 ################################################################################
 ## Script Body #################################################################
 ################################################################################
 
 function release_script_main() {
+    local VERSION_CONFIG=VERSION
+
     if [ -z "$(gather_revision_notes)" ]; then
         echo "Version up to date with dev branch."
         exit 0
@@ -105,7 +73,7 @@ function release_script_main() {
     change_branch_to_master
 
     echo "Determining old version."
-    OLD_VERSION="$(determine_old_version)"
+    OLD_VERSION="$(cat ${VERSION_CONFIG})"
 
     echo "Please provide new version number.  Old version was ${OLD_VERSION}."
     NEW_VERSION="$(prompt_for_input)"
@@ -121,20 +89,17 @@ function release_script_main() {
 
     ask_user_whether_to_continue_or_exit
 
-    CONFIG_FILE=./dwm/config.h
-    echo "Rewriting version from ${OLD_VERSION} to ${NEW_VERSION} in ${CONFIG_FILE}."
-    TMP_CONFIG=$(mktemp)
-    write_new_version_to_config_file "${NEW_VERSION}" "${CONFIG_FILE}" "${TMP_CONFIG}"
-
-    echo "Verifying new version of ${CONFIG_FILE} looks as expected."
-    exit_if_new_config_file_doesnt_look_right
-    mv ${TMP_CONFIG} ${CONFIG_FILE}
-
     echo "Rolling up dev changes into commit."
     roll_up_dev_changes_into_master_commit
 
+    echo "Writing new version to the VERSION file."
+    echo "${NEW_VERSION}" > "${VERSION_CONFIG}"
+
+    echo "Running go generate to update files for the new release."
+    go generate ./...
+
     echo "Committing new versioned config."
-    git add ${CONFIG_FILE}
+    git add "${VERSION_CONFIG}"
     git commit -m "Update version to ${NEW_VERSION}"
 
     echo "Creating tag for version ${NEW_VERSION}"

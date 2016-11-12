@@ -32,12 +32,12 @@ import (
 
 type EventHandler func(int, *X.Event)
 
-var currentEventHandler EventHandler = dwmEventHandler
-
-//go:generate bash update_version.sh ${GOFILE}
+//go:generate bash ../update_version.sh ${GOFILE}
 //go:generate git add ${GOFILE}
 var version string = "7.1.16"
 var name string = "go-dwm"
+
+var currentEventHandler EventHandler = dwmEventHandler
 
 func dwmEventHandler(event_type int, event *X.Event) {
 	var cEventType C.int = C.int(event_type)
@@ -73,8 +73,8 @@ func dwmEventHandler(event_type int, event *X.Event) {
 	}
 }
 
-func invokeEventHandler(eventType int, event *X.Event) {
-	currentEventHandler(eventType, event)
+func invokeEventHandler(event *X.Event) {
+	currentEventHandler(event)
 }
 
 func SetEventHandler(newHandler EventHandler) {
@@ -120,11 +120,15 @@ func Run() {
 
 	dpy.Sync(false)
 
-	var ev X.Event
-	for C.running == C.True && dpy.NextEvent(&ev) == 0 {
+	for C.running == C.True {
+		var ev X.Event
+		if (dpy.NextEvent(&ev) != 0) {
+			break
+		}
+
 		eventType := ev.EventType()
 		if eventType < int(C.LASTEvent) {
-			invokeEventHandler(eventType, &ev);
+			invokeEventHandler(&ev);
 		}
 	}
 }
