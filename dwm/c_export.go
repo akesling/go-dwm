@@ -3,7 +3,7 @@ package dwm
 /*
 #include <X11/Xlib.h>
 
-extern void Handler(int event_type, XEvent* event);
+extern void Handler(XEvent* event);
 */
 import "C"
 
@@ -15,8 +15,8 @@ import (
 // for a Cgo file is included multiple times, so it can't have definitions (as
 // we need to in order to interact with dwm.h).
 //export Handler
-func Handler(event_type C.int, event *C.XEvent) {
-	invokeEventHandler(int(event_type), (*X.Event)(event))
+func Handler(event *C.XEvent) {
+	invokeEventHandler((*X.Event)(event))
 }
 
 //export wm_version_name

@@ -30,7 +30,7 @@ import (
 	"os"
 )
 
-type EventHandler func(int, *X.Event)
+type EventHandler func(*X.Event)
 
 //go:generate bash ../update_version.sh ${GOFILE}
 //go:generate git add ${GOFILE}
@@ -39,8 +39,8 @@ var name string = "go-dwm"
 
 var currentEventHandler EventHandler = dwmEventHandler
 
-func dwmEventHandler(event_type int, event *X.Event) {
-	var cEventType C.int = C.int(event_type)
+func dwmEventHandler(event *X.Event) {
+	var cEventType C.int = C.int(event.EventType())
 	switch cEventType {
 	case C.ButtonPress:
 		C.buttonpress((*C.XEvent)(event))
